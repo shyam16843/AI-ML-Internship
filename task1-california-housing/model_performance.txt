@@ -1,0 +1,14 @@
+MODEL PERFORMANCE METRICS
+=========================
+
+Root Mean Squared Error (RMSE): 0.8117
+Mean Absolute Error (MAE): 0.6033
+R² Score: 0.4972
+Adjusted R² Score: 0.4968
+
+MODEL COEFFICIENTS
+====================
+Intercept: 0.0173
+MedInc: 0.4448
+AveRooms: -0.0281
+HouseAge: 0.0168
