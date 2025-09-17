@@ -38,7 +38,7 @@ Develop a machine learning pipeline to segment retail customers based on purchas
 - **Cluster 2:** Low frequency, high spenders but short customer lifetime — potentially new or one-time big buyers.
 
 ## 5. Visualization Overview
-A comprehensive set of visualizations supporting this project is provided separately in the [Visualization Document](Visualization.md). This document includes detailed descriptions and analyses of all key plots
+A comprehensive set of visualizations supporting this project is provided separately in the [Visualization Document](Visualizations.md). This document includes detailed descriptions and analyses of all key plots
 
 ### Accessing Visualizations
 
