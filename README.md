@@ -17,12 +17,18 @@ This repository contains all projects and tasks completed during my AI/ML intern
 - **Status**: Completed ✅
 - [View Project](./task4-Predict-Titanic-Survival/README.md)
 
+### Task 5: Customer Segmentation - Online Retail Dataset
+- **Description**: Customer segmentation using K-Means clustering on the Online Retail dataset with detailed RFM analysis, feature engineering, outlier handling, clustering evaluation, and visualization.
+- **Technologies**: Python, Pandas, Scikit-learn, Matplotlib, Seaborn, PCA, DBSCAN
+- **Status**: Completed ✅
+- [View Project](./task5-Customer-Segmentation/README.md)
 
 ## Progress Tracking
-| Task | Project Name                  | Status    | Completion Date |
-|-------|------------------------------|-----------|-----------------|
-| 1     | California Housing Price Prediction | Completed | 2025-09-13       |
-| 4     | Titanic Survival Prediction         | Completed | 2025-09-16       |
+| Task | Project Name                        | Status    | Completion Date |
+|-------|-----------------------------------|-----------|-----------------|
+| 1     | California Housing Price Prediction| Completed | 2025-09-13      |
+| 4     | Titanic Survival Prediction        | Completed | 2025-09-16      |
+| 5     | Customer Segmentation - Online Retail Dataset | Completed | 2025-09-17      |
 
 ## Installation
 Each project has its own requirements. Please check individual project READMEs for specific instructions.
