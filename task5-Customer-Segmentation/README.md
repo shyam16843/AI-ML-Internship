@@ -4,12 +4,14 @@
 This project segments customers of an online retail business using K-Means clustering. It includes detailed data preprocessing, feature engineering with RFM analysis, cluster evaluation, visualization, and business interpretation to uncover actionable customer groups.
 
 ## 1. Project Objective
-Build a meaningful and actionable customer segmentation model to support targeted marketing and retention strategies. The objective is to identify distinct customer segments based on purchasing behaviors and value metrics.
+Develop a machine learning pipeline to segment retail customers based on purchasing behavior and value metrics. This helps in understanding customer groups and tailoring marketing approaches for improved retention and revenue growth.
+
 
 ## 2. Dataset Information
 - **Source**: Online Retail dataset (`Online Retail.xlsx`), containing UK transactions from a retail store.
-- **Records**: Over 500,000 transaction records.
-- **Features**: Includes invoice details, product codes, descriptions, prices, quantities, customer IDs, countries, and purchase timestamps.
+- **Records**: 541,909 transaction records from an online retailer.
+- 4,338 unique customers after preprocessing.
+- **Features**:include customers' purchase frequency, monetary spend, product diversity, and lifetime metrics.
 - **Target**: Unsupervised clustering labels (customer segments).
 
 ## 3. Methodology
@@ -23,10 +25,17 @@ Build a meaningful and actionable customer segmentation model to support targete
 - **Visualization**: Multi-faceted exploratory plots including pairplots, PCA, boxplots, and cluster-wise feature distributions.
 - **Country-wise Analysis**: Distribution of clusters over top countries to analyze geographic patterns.
 
-## 4. Model Performance and Analysis
-- Elbow and Silhouette analysis support selection of 3 optimal clusters.
-- Cluster sizes are balanced and clearly distinct.
-- Business insights: identifying "Champions", "Loyal Customers", "At Risk", and "Lost Customers" segments based on cluster profiles.
+## 4. Cluster Characteristics & Interpretation
+| Cluster | Size (No. Customers) | Recency (Days) | Frequency (Purchases) | Monetary ($) | Avg. Spend / Day ($) | Lifetime (Days) | Product Diversity |
+|---|---|---|---|---|---|---|---|
+| 0 | 1,539 | 58.6 | 3.2 | 914.35 | 12.7 | 170.6 | 151 |
+| 1 | 641 | 35.2 | 8.3 | 3,631.91 | 65.3 | 259.1 | 103 |
+| 2 | 86 | 153.5 | 1.3 | 11353.87 | 180.5 | 15.9 | 22 |
+
+### Insights
+- **Cluster 0:** Moderate activity and spending, representing steady customers.
+- **Cluster 1:** High frequency and spending, loyal customers with diverse product interests.
+- **Cluster 2:** Low frequency, high spenders but short customer lifetime — potentially new or one-time big buyers.
 
 ## 5. Visualization Overview
 A comprehensive set of visualizations supporting this project is provided separately in the [Visualization Document](visualization.md). This document includes detailed descriptions and analyses of all key plots
@@ -37,10 +46,11 @@ The actual plot images referenced in the visualization document are stored in th
 
 We recommend reviewing the visualization document alongside the main README for a thorough understanding of the model's performance and insightful data interpretations.
 
-## 6. Business and Research Implications
-- Helps tailor marketing efforts by segment.
-- Supports customer retention strategies via focused campaign targeting.
-- Provides insight into purchase behaviors across geography.
+## 6. Business Recommendations
+- **Cluster 0:** Implement promotions to encourage higher purchase frequency.
+- **Cluster 1:** Target with loyalty programs and exclusive offers.
+- **Cluster 2:** Drive re-engagement with personalized outreach campaigns.
+- Monitor migration between clusters for dynamic targeting.
 
 ## 7. Project Setup and Requirements
 
