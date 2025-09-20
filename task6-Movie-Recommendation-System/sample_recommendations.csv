@@ -1,0 +1,66 @@
+UserID,Movie,PredictedRating,Explanation
+1,How to Train Your Dragon (2010),4.703703703703704,"Recommended 'How to Train Your Dragon (2010)' because you liked:
+  - 'Robin Hood (1973)' (similarity: 0.21, your rating: 5.0)
+  - 'Gladiator (2000)' (similarity: 0.17, your rating: 5.0)
+  - 'Jungle Book, The (1967)' (similarity: 0.17, your rating: 5.0)
+"
+1,Life of Pi (2012),4.703703703703704,"Recommended 'Life of Pi (2012)' because you liked:
+  - 'Wayne's World (1992)' (similarity: 0.12, your rating: 5.0)
+  - 'Bambi (1942)' (similarity: 0.12, your rating: 5.0)
+  - 'Planet of the Apes (1968)' (similarity: 0.12, your rating: 5.0)
+"
+1,The Hunger Games (2012),4.703703703703704,"Recommended 'The Hunger Games (2012)' because you liked:
+  - 'Robin Hood (1973)' (similarity: 0.19, your rating: 5.0)
+  - 'Gladiator (2000)' (similarity: 0.17, your rating: 5.0)
+  - 'South Park: Bigger, Longer and Uncut (1999)' (similarity: 0.14, your rating: 5.0)
+"
+1,Yes Man (2008),4.703703703703704,"Recommended 'Yes Man (2008)' because you liked:
+  - 'American History X (1998)' (similarity: 0.14, your rating: 5.0)
+  - 'Dumbo (1941)' (similarity: 0.11, your rating: 5.0)
+  - 'Planet of the Apes (1968)' (similarity: 0.10, your rating: 5.0)
+"
+1,12 Years a Slave (2013),4.703703703703703,"Recommended '12 Years a Slave (2013)' because you liked:
+  - 'American History X (1998)' (similarity: 0.18, your rating: 5.0)
+  - 'Blazing Saddles (1974)' (similarity: 0.12, your rating: 5.0)
+"
+2,"Shining, The (1980)",4.068377156736392,"Recommended 'Shining, The (1980)' because you liked:
+  - 'Inglourious Basterds (2009)' (similarity: 0.21, your rating: 4.5)
+  - 'Departed, The (2006)' (similarity: 0.14, your rating: 4.0)
+"
+2,Blade Runner (1982),4.058575042031094,"Recommended 'Blade Runner (1982)' because you liked:
+  - 'Inglourious Basterds (2009)' (similarity: 0.20, your rating: 4.5)
+  - 'Departed, The (2006)' (similarity: 0.15, your rating: 4.0)
+"
+2,How to Train Your Dragon (2010),4.055744952870898,"Recommended 'How to Train Your Dragon (2010)' because you liked:
+  - 'Inglourious Basterds (2009)' (similarity: 0.16, your rating: 4.5)
+  - 'Whiplash (2014)' (similarity: 0.13, your rating: 4.0)
+"
+2,Annie Hall (1977),4.054333614099347,"Recommended 'Annie Hall (1977)' because you liked:
+  - 'Inglourious Basterds (2009)' (similarity: 0.13, your rating: 4.5)
+  - 'Departed, The (2006)' (similarity: 0.11, your rating: 4.0)
+"
+2,"Rocky Horror Picture Show, The (1975)",4.053955881431508,"Recommended 'Rocky Horror Picture Show, The (1975)' because you liked:
+  - 'Inglourious Basterds (2009)' (similarity: 0.13, your rating: 4.5)
+  - 'Departed, The (2006)' (similarity: 0.10, your rating: 4.0)
+"
+3,Gattaca (1997),3.3750000000000004,"Recommended 'Gattaca (1997)' because you liked:
+  - 'Road Warrior, The (Mad Max 2) (1981)' (similarity: 0.18, your rating: 5.0)
+  - 'Escape from L.A. (1996)' (similarity: 0.14, your rating: 5.0)
+"
+3,Rambo: First Blood Part II (1985),3.375,"Recommended 'Rambo: First Blood Part II (1985)' because you liked:
+  - 'Road Warrior, The (Mad Max 2) (1981)' (similarity: 0.27, your rating: 5.0)
+  - 'Escape from L.A. (1996)' (similarity: 0.25, your rating: 5.0)
+"
+3,Swordfish (2001),3.375,"Recommended 'Swordfish (2001)' because you liked:
+  - 'Escape from L.A. (1996)' (similarity: 0.15, your rating: 5.0)
+  - 'Road Warrior, The (Mad Max 2) (1981)' (similarity: 0.12, your rating: 5.0)
+"
+3,Brazil (1985),3.221772361085847,"Recommended 'Brazil (1985)' because you liked:
+  - 'Escape from L.A. (1996)' (similarity: 0.16, your rating: 5.0)
+  - 'Thing, The (1982)' (similarity: 0.12, your rating: 4.0)
+  - 'Road Warrior, The (Mad Max 2) (1981)' (similarity: 0.11, your rating: 5.0)
+"
+3,Iron Man 3 (2013),3.2051338169841848,"Recommended 'Iron Man 3 (2013)' because you liked:
+  - 'Road Warrior, The (Mad Max 2) (1981)' (similarity: 0.20, your rating: 5.0)
+  - 'Thing, The (1982)' (similarity: 0.10, your rating: 4.0)
+"
