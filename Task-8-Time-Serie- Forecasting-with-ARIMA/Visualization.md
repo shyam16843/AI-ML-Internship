@@ -6,7 +6,7 @@ This document provides detailed descriptions and insights into all visualization
 
 ## 1. AAPL Stock Price History Plot
 
-![Figure1](images/Figure1.png)
+![Figure1](images/Figure_1.png)
 
 **Description:**  
 - Line chart showing the Apple stock closing prices over the full historical period from 1980 to 2022.
@@ -20,7 +20,7 @@ This document provides detailed descriptions and insights into all visualization
 
 ## 2. AAPL Time Series Decomposition
 
-![Figure2](images/Figure2.png)
+![Figure2](images/Figure_2.png)
 
 **Description:**  
 - Multi-panel plot decomposing the time series into observed, trend, seasonal, and residual components.
@@ -35,7 +35,7 @@ This document provides detailed descriptions and insights into all visualization
 
 ## 3. AAPL Autocorrelation Analysis
 
-![Figure3](images/Figure3.png)
+![Figure3](images/Figure_3.png)
 
 **Description:**  
 - Plots showing autocorrelation (ACF) and partial autocorrelation (PACF) for differenced closing prices.
@@ -49,7 +49,7 @@ This document provides detailed descriptions and insights into all visualization
 
 ## 4. AAPL Forecast vs Actual with 95% Confidence Interval
 
-![Figure4](images/Figure4.png)
+![Figure4](images/Figure_4.png)
 
 **Description:**  
 - Overlay plot of historical Apple closing prices, test set actual prices, and model forecasts.
@@ -63,7 +63,7 @@ This document provides detailed descriptions and insights into all visualization
 
 ## 5. AAPL 30-Day Price Forecast
 
-![Figure5](images/Figure5.png)
+![Figure5](images/Figure_5.png)
 
 **Description:**  
 - Forecast plot showing predicted closing prices for the next 30 business days.
@@ -78,7 +78,7 @@ This document provides detailed descriptions and insights into all visualization
 
 ## 6. Forecast Accuracy Comparison
 
-![Figure6](images/Figure6.png)
+![Figure6](images/Figure_6.png)
 
 **Description:**  
 - Bar chart comparing RMSE values of ARIMA and SARIMA models on AAPL stock.
