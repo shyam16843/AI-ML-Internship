@@ -27,23 +27,27 @@ This repository contains all projects and tasks completed during my AI/ML intern
 - **Description**: Advanced movie recommendation system using collaborative filtering with cosine similarity and matrix factorization (SVD). Features personalized recommendations, similarity analysis, explanation system, and comprehensive evaluation metrics.
 - **Technologies**: Python, Pandas, Scikit-learn, Matplotlib, Seaborn, Cosine Similarity, SVD, Matrix Factorization
 - **Status**: Completed ✅
-- [View Project](./task5-Customer-Segmentation/README.md)
+- [View Project](./task6-Movie-Recommendation-System/README.md)
 
-
+### Task 8: Apple Stock Price Forecasting using ARIMA and SARIMA
+- **Description**: Time series forecasting of Apple stock prices using ARIMA and SARIMA models with automated order selection, seasonal decomposition, ACF/PACF analysis, 30-day ahead prediction, and buy/hold signal recommendations.
+- **Technologies**: Python, Pandas, Matplotlib, Seaborn, Statsmodels, Pmdarima, Scikit-learn
+- **Status**: Completed ✅
+- [View Project](./task8-Apple-Stock-Price-Forecasting/README.md)
 
 ## Progress Tracking
-| Task | Project Name                        | Status    | Completion Date |
-|-------|-----------------------------------|-----------|-----------------|
-| 1     | California Housing Price Prediction| Completed | 2025-09-13      |
-| 4     | Titanic Survival Prediction        | Completed | 2025-09-16      |
+| Task | Project Name                                 | Status   | Completion Date |
+|-------|--------------------------------------|-----------|-----------------|
+| 1     | California Housing Price Prediction         | Completed | 2025-09-13      |
+| 4     | Titanic Survival Prediction                  | Completed | 2025-09-16      |
 | 5     | Customer Segmentation - Online Retail Dataset | Completed | 2025-09-17      |
-| 6     | Movie Recommendation System       | Completed | 2025-09-20      |
+| 6     | Movie Recommendation System                   | Completed | 2025-09-20      |
+| 8     | Apple Stock Price Forecasting using ARIMA and SARIMA | Completed | 2025-09-22  |
 
 ## Installation
 Each project has its own requirements. Please check individual project READMEs for specific instructions.
 
 ## Contact
-- **Name:** Ghanashyam T V  
-- **Email:** [ghanashyamtv16@gmail.com](mailto:ghanashyamtv16@gmail.com)  
+- **Name:** Ghanashyam T V
+- **Email:** [ghanashyamtv16@gmail.com](mailto:ghanashyamtv16@gmail.com)
 - **LinkedIn:** [linkedin.com/in/ghanashyam-tv](https://www.linkedin.com/in/ghanashyam-tv)
-
