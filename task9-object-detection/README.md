@@ -62,6 +62,10 @@ Develop a robust real-time object detection system that can:
 - **'s'**: Save current frame as image
 - **'p'**: Pause/resume detection
 
+### Accessing Visualizations
+
+We recommend reviewing the video document alongside the main README for a thorough understanding of the model's performance. `Recording 2025-09-23 201712.mp4` 
+
 ## 5. Performance Metrics
 - **Frame Rate**: 30 FPS target (hardware dependent)
 - **Detection Accuracy**: Based on YOLOv5su pre-trained weights
