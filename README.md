@@ -33,7 +33,15 @@ This repository contains all projects and tasks completed during my AI/ML intern
 - **Description**: Time series forecasting of Apple stock prices using ARIMA and SARIMA models with automated order selection, seasonal decomposition, ACF/PACF analysis, 30-day ahead prediction, and buy/hold signal recommendations.
 - **Technologies**: Python, Pandas, Matplotlib, Seaborn, Statsmodels, Pmdarima, Scikit-learn
 - **Status**: Completed ✅
-- [View Project](./task8-Apple-Stock-Price-Forecasting/README.md)
+- [View Project](./Task-8-Time-Serie-Forecasting-with-ARIMA/README.md)
+
+### Task 9: Real-time Object Detection using YOLOv5
+- **Description**: Advanced computer vision system for real-time multi-object detection.
+- **Technologies**: Python, OpenCV, YOLOv5, PyTorch, NumPy
+- **Status**: Completed ✅
+- [View Project](./task9-object-detection/README.md)
+
+
 
 ## Progress Tracking
 | Task | Project Name                                 | Status   | Completion Date |
@@ -43,6 +51,7 @@ This repository contains all projects and tasks completed during my AI/ML intern
 | 5     | Customer Segmentation - Online Retail Dataset | Completed | 2025-09-17      |
 | 6     | Movie Recommendation System                   | Completed | 2025-09-20      |
 | 8     | Apple Stock Price Forecasting using ARIMA and SARIMA | Completed | 2025-09-22  |
+| 9     | object-detection | Completed | 2025-09-23  |
 
 ## Installation
 Each project has its own requirements. Please check individual project READMEs for specific instructions.
