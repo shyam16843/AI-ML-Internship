@@ -41,17 +41,32 @@ This repository contains all projects and tasks completed during my AI/ML intern
 - **Status**: Completed ✅
 - [View Project](./task9-object-detection/README.md)
 
+### Task 10: english2malayalam Neural Machine Translation System
+- **Description**: State-of-the-art transformer-based neural machine translation system with real-time translation, confidence scoring, quality assessment, and domain-specific adaptations (technical, medical, legal).
+- **Technologies**: Python, PyTorch, Transformers, Hugging Face, Streamlit, Neural Machine Translation, Transformer Architecture
+- **Status**: Completed ✅
+- [View Project](./task10-english2malayalam/README.md)
 
 
 ## Progress Tracking
-| Task | Project Name                                 | Status   | Completion Date |
-|-------|--------------------------------------|-----------|-----------------|
-| 1     | California Housing Price Prediction         | Completed | 2025-09-13      |
-| 4     | Titanic Survival Prediction                  | Completed | 2025-09-16      |
-| 5     | Customer Segmentation - Online Retail Dataset | Completed | 2025-09-17      |
-| 6     | Movie Recommendation System                   | Completed | 2025-09-20      |
-| 8     | Apple Stock Price Forecasting using ARIMA and SARIMA | Completed | 2025-09-22  |
-| 9     | object-detection | Completed | 2025-09-23  |
+
+| Task  | Project Name                                         | Status    | Completion Date |
+|-------|------------------------------------------------------|-----------|-----------------|
+| 1     | California Housing Price Prediction                  | Completed | 2025-09-13      |
+| 4     | Titanic Survival Prediction                          | Completed | 2025-09-16      |
+| 5     | Customer Segmentation - Online Retail Dataset        | Completed | 2025-09-17      |
+| 6     | Movie Recommendation System                          | Completed | 2025-09-20      |
+| 8     | Apple Stock Price Forecasting using ARIMA and SARIMA | Completed | 2025-09-22      |
+| 9     | object-detection                                     | Completed | 2025-09-23      |
+| 10    | English-Malayalam Neural Machine Translation System  | Completed | 2025-09-24      |
+
+## Skills Demonstrated
+- **Machine Learning**: Regression, Classification, Clustering, Recommendation Systems
+- **Deep Learning**: Neural Networks, Transformer Architectures, Computer Vision
+- **Natural Language Processing**: Machine Translation, Text Processing
+- **Time Series Analysis**: ARIMA, SARIMA, Forecasting
+- **Computer Vision**: Object Detection, Real-time Processing
+- **Data Analysis**: Feature Engineering, Visualization, Statistical Modeling
 
 ## Installation
 Each project has its own requirements. Please check individual project READMEs for specific instructions.
@@ -60,3 +75,5 @@ Each project has its own requirements. Please check individual project READMEs f
 - **Name:** Ghanashyam T V
 - **Email:** [ghanashyamtv16@gmail.com](mailto:ghanashyamtv16@gmail.com)
 - **LinkedIn:** [linkedin.com/in/ghanashyam-tv](https://www.linkedin.com/in/ghanashyam-tv)
+
+------
