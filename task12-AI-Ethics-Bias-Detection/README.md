@@ -46,7 +46,7 @@ Detect, quantify, and reduce potential social biases (gender, occupation, race, 
 
 ## 4. Example Visuals
 
-![Bias Analysis Plots](bias_analysis_visualization.jpg)
+![Bias Analysis Plots](bias_analysis_visualization.png)
 
 ***
 
