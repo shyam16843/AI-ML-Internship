@@ -166,12 +166,22 @@ def main():
         # Gender balance by text
         plt.subplot(2, 2, 3)
         plt.scatter(report_df['male_pronouns'], report_df['female_pronouns'], alpha=0.6)
-        plt.plot([0, 5], [0, 5], 'r--', alpha=0.5)  # Ideal balance line
+        plt.plot([0, max(report_df['male_pronouns'].max(), report_df['female_pronouns'].max())],
+         [0, max(report_df['male_pronouns'].max(), report_df['female_pronouns'].max())],
+         'r--', alpha=0.5) # Ideal balance line
         plt.title('Male vs Female Pronouns per Text')
         plt.xlabel('Male Pronouns')
         plt.ylabel('Female Pronouns')
-        
-        plt.tight_layout()
+
+        plt.subplot(2, 2, 4)
+        labels = ['Male', 'Female', 'Neutral']
+        sizes = [summary['total_male_pronouns'], summary['total_female_pronouns'], summary['total_neutral_pronouns']]
+        colors = ['lightblue', 'lightpink', 'lightgreen']
+        plt.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
+        plt.title('Pronoun Proportions')
+
+        plt.suptitle('Bias Analysis Summary', fontsize=16, fontweight='bold')
+        plt.tight_layout(rect=[0, 0, 1, 0.96])
         plt.savefig('bias_analysis_visualization.png', dpi=300, bbox_inches='tight')
         print(f"✓ Visualization saved as 'bias_analysis_visualization.png'")
         
