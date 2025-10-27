@@ -53,6 +53,14 @@ This repository contains all projects and tasks completed during my AI/ML intern
 - **Status:** Completed ✅
 - [View Project](./task11-chatbot/README.md)
 
+### Task 12: AI Ethics Bias Detection & Mitigation Pipeline
+- **Description:** Comprehensive pipeline for auditing and mitigating social biases (gender, occupation, race, etc.) in Large Language Model (LLM) outputs. Features automated bias probe generation, dual LLM querying (with/without mitigation), advanced NLP/statistical analysis, and data/visual reporting. All results are traceable through CSVs and professional plots.
+- **Technologies:** Python, spaCy, pandas, matplotlib, TextBlob, Ollama, Llama 3
+- **Status:** Completed ✅
+- [View Project](./task12-AI-Ethics-Bias-Detection/README.md)
+
+***
+
 ## Progress Tracking
 
 | Task  | Project Name                                         | Status    | Completion Date |
@@ -65,6 +73,8 @@ This repository contains all projects and tasks completed during my AI/ML intern
 | 9     | object-detection                                     | Completed | 2025-09-23      |
 | 10    | English-Malayalam Neural Machine Translation System  | Completed | 2025-09-24      |
 | 11    | AI Virtual Career Counsellor                         | Completed | 2025-10-27      |
+| 12    | AI Ethics Bias Detection & Mitigation Pipeline       | Completed | 2025-10-27      |
+
 ## Skills Demonstrated
 - **Machine Learning**: Regression, Classification, Clustering, Recommendation Systems
 - **Deep Learning**: Neural Networks, Transformer Architectures, Computer Vision
