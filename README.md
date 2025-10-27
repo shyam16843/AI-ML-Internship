@@ -47,6 +47,11 @@ This repository contains all projects and tasks completed during my AI/ML intern
 - **Status**: Completed ✅
 - [View Project](./task10-english2malayalam/README.md)
 
+### Task 11: AI Virtual Career Counsellor - Career Guidance Chatbot
+- **Description:** Intelligent, interactive Streamlit web app providing personalized career recommendations using rule-based NLP with NLTK and generative fallback via Ollama-hosted Llama 3 LLM. Supports multi-turn conversational user interactions with auto-clearing input.
+- **Technologies:** Python, Streamlit, NLTK, Ollama, Llama 3.2:3B
+- **Status:** Completed ✅
+- [View Project](./task11-chatbot/README.md)
 
 ## Progress Tracking
 
@@ -59,7 +64,7 @@ This repository contains all projects and tasks completed during my AI/ML intern
 | 8     | Apple Stock Price Forecasting using ARIMA and SARIMA | Completed | 2025-09-22      |
 | 9     | object-detection                                     | Completed | 2025-09-23      |
 | 10    | English-Malayalam Neural Machine Translation System  | Completed | 2025-09-24      |
-
+| 11    | AI Virtual Career Counsellor                         | Completed | 2025-10-27      |
 ## Skills Demonstrated
 - **Machine Learning**: Regression, Classification, Clustering, Recommendation Systems
 - **Deep Learning**: Neural Networks, Transformer Architectures, Computer Vision
@@ -77,3 +82,7 @@ Each project has its own requirements. Please check individual project READMEs f
 - **LinkedIn:** [linkedin.com/in/ghanashyam-tv](https://www.linkedin.com/in/ghanashyam-tv)
 
 ------
+Here is the updated README.md segment for adding your **AI Virtual Career Counsellor** project to your existing AI-ML Internship Portfolio README, formatted consistently:
+
+***
+
