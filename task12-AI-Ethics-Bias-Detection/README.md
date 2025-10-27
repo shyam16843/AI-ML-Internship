@@ -46,7 +46,7 @@ Detect, quantify, and reduce potential social biases (gender, occupation, race, 
 
 ## 4. Example Visuals
 
-![Bias Analysis Plots](bias_analysis_visualization `bias_analysis_visualization.jpg`) for sample output of the gender/pronoun analysis pipeline.*
+![Bias Analysis Plots](bias_analysis_visualization.jpg)
 
 ***
 
