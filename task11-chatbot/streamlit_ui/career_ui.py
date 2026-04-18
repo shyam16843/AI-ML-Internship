@@ -1,13 +1,11 @@
 import streamlit as st
 import requests
 import nltk
-import os
 
 # Download nltk data
 nltk.download('punkt', quiet=True)
 nltk.download('punkt_tab', quiet=True)
 
-# Career intent keywords and recommendations
 CAREER_KEYWORDS = {
     "tech": ["software", "python", "engineer", "data", "machine learning", "ai", "coding", "programming", "developer", "computer"],
     "arts": ["design", "painting", "music", "writing", "art", "creative", "drawing", "photography", "film"],
@@ -56,7 +54,6 @@ def extract_career_intent(text):
         words = nltk.word_tokenize(text.lower())
     except Exception:
         words = text.lower().split()
-    
     for intent, kw_list in CAREER_KEYWORDS.items():
         for kw in kw_list:
             if kw in words or kw in text.lower():
@@ -64,40 +61,31 @@ def extract_career_intent(text):
     return None
 
 def get_hf_response(text, hf_token):
-    """Query Hugging Face Inference API"""
-    API_URL = "https://api-inference.huggingface.co/models/google/flan-t5-large"
+    API_URL = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill"
     headers = {"Authorization": f"Bearer {hf_token}"}
-
-    payload = {
-        "inputs": f"You are a career counsellor. Give practical career advice in 3-4 sentences. Question: {text}",
-        "parameters": {
-            "max_new_tokens": 200,
-            "temperature": 0.7,
-        }
-    }
+    payload = {"inputs": f"I need career advice. {text}"}
 
     try:
         response = requests.post(API_URL, headers=headers, json=payload, timeout=30)
         if response.status_code == 200:
             result = response.json()
-            if isinstance(result, list) and len(result) > 0:
+            if isinstance(result, dict) and "generated_text" in result:
+                return result["generated_text"].strip()
+            elif isinstance(result, list) and len(result) > 0:
                 return result[0].get('generated_text', '').strip()
             return "I received a response but couldn't parse it. Please try again."
         elif response.status_code == 503:
-            return "The AI model is loading (this takes ~20 seconds on first use). Please click Ask again in a moment."
+            return "⏳ The AI model is loading. Please click Ask again in 20 seconds."
+        elif response.status_code == 401:
+            return "❌ Invalid Hugging Face token. Please check your Streamlit secrets."
         else:
-            return f"API error {response.status_code}. Please check your Hugging Face token in settings."
+            return f"❌ API error {response.status_code}. Please try again."
     except requests.exceptions.Timeout:
-        return "Request timed out. The model may be loading — please try again in 20 seconds."
+        return "⏳ Request timed out. Please try again in 20 seconds."
     except Exception as e:
-        return f"Connection error: {str(e)}"
+        return f"❌ Connection error: {str(e)}"
 
-# Page config
-st.set_page_config(
-    page_title="AI Virtual Career Counsellor",
-    page_icon="🎯",
-    layout="centered"
-)
+st.set_page_config(page_title="AI Virtual Career Counsellor", page_icon="🎯", layout="centered")
 
 st.markdown("""
 <style>
@@ -109,7 +97,6 @@ st.markdown("""
 st.markdown('<div class="main-header">🎯 AI Virtual Career Counsellor</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-header">Get personalized career guidance powered by NLP + AI</div>', unsafe_allow_html=True)
 
-# Get HF token from Streamlit secrets
 hf_token = None
 try:
     hf_token = st.secrets["HF_TOKEN"]
@@ -117,9 +104,8 @@ except Exception:
     pass
 
 if not hf_token:
-    st.warning("⚠️ Hugging Face API token not configured. Rule-based recommendations will still work, but AI responses require a token.")
+    st.warning("⚠️ Hugging Face API token not configured. Rule-based recommendations will still work.")
 
-# Sidebar
 st.sidebar.title("💡 How to use")
 st.sidebar.markdown("""
 1. Type your interests or career question
@@ -133,12 +119,10 @@ st.sidebar.markdown("""
 - "I'm interested in finance and business"
 - "What skills do I need for data science?"
 """)
-
 st.sidebar.markdown("---")
 st.sidebar.markdown("**Built by Ghanashyam T V**")
 st.sidebar.markdown("[GitHub](https://github.com/shyam16843) | [LinkedIn](https://linkedin.com/in/ghanashyam-tv)")
 
-# Sample questions
 st.markdown("**Try these:**")
 col1, col2, col3 = st.columns(3)
 with col1:
@@ -153,7 +137,6 @@ with col3:
 
 st.markdown("---")
 
-# Initialize session state
 if "user_input" not in st.session_state:
     st.session_state["user_input"] = ""
 if "response" not in st.session_state:
@@ -165,9 +148,7 @@ def ask():
     user_input = st.session_state["user_input"]
     if not user_input.strip():
         return
-
     intent = extract_career_intent(user_input)
-
     if intent:
         st.session_state["response"] = CAREER_RECOMMENDATIONS[intent]
         st.session_state["response_type"] = "rule"
@@ -177,12 +158,10 @@ def ask():
                 st.session_state["response"] = get_hf_response(user_input, hf_token)
                 st.session_state["response_type"] = "llm"
         else:
-            st.session_state["response"] = "I couldn't detect a specific career domain from your message. Try mentioning interests like 'coding', 'design', 'finance', or 'machine learning' for instant recommendations."
+            st.session_state["response"] = "Try mentioning 'coding', 'design', 'finance', or 'machine learning' for instant recommendations."
             st.session_state["response_type"] = "fallback"
-
     st.session_state["user_input"] = ""
 
-# Input
 user_input = st.text_area(
     "Tell me about your interests and background:",
     key="user_input",
@@ -192,7 +171,6 @@ user_input = st.text_area(
 
 st.button("🎯 Ask", on_click=ask, type="primary", use_container_width=True)
 
-# Display response
 if st.session_state.get("response"):
     st.markdown("---")
     if st.session_state["response_type"] == "rule":
@@ -201,5 +179,4 @@ if st.session_state.get("response"):
         st.info("**AI Career Advice:**")
     else:
         st.warning("**Guidance:**")
-
     st.markdown(st.session_state["response"])
