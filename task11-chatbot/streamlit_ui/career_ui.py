@@ -62,7 +62,7 @@ def extract_career_intent(text):
 
 def get_gemini_response(text, api_key):
     """Query Google Gemini API - free and reliable"""
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={api_key}"
     headers = {"Content-Type": "application/json"}
     payload = {
         "contents": [{
