@@ -5,12 +5,6 @@ import nltk
 nltk.download('punkt', quiet=True)
 nltk.download('punkt_tab', quiet=True)
 
-CAREER_KEYWORDS = {
-    "tech": ["software", "python", "engineer", "data", "machine learning", "ai", "coding", "programming", "developer", "computer"],
-    "arts": ["design", "painting", "music", "writing", "art", "creative", "drawing", "photography", "film"],
-    "commerce": ["business", "finance", "accounting", "sales", "marketing", "management", "economics", "banking"]
-}
-
 CAREER_RECOMMENDATIONS = {
     "tech": """🖥️ **Tech Career Recommendations**
 
@@ -43,38 +37,31 @@ Based on your interests, here are strong career paths:
 **Next steps:** Get certified (CFA, Google Digital Marketing), build Excel/data skills, network on LinkedIn."""
 }
 
+# Only trigger rule-based response for very simple one-topic messages
+SIMPLE_TRIGGERS = {
+    "tech": ["i love coding", "i like coding", "i enjoy coding", "i love programming", 
+             "i like programming", "i love software", "i like software", "i love computers",
+             "i am a developer", "i want to be a developer"],
+    "arts": ["i love art", "i like art", "i enjoy art", "i love design", "i like design",
+             "i love drawing", "i love painting", "i love music", "i love writing",
+             "i love photography", "i enjoy creative"],
+    "commerce": ["i love business", "i like business", "i love finance", "i like finance",
+                 "i love accounting", "i like marketing", "i love economics", "i like banking"]
+}
+
 def extract_career_intent(text):
-    if not text:
-        return None
-    
-    # If the message is a follow-up/specific question, let Gemini handle it
-    followup_keywords = ["specialize", "specialise", "what should", "which one", 
-                         "best for me", "how to", "how do", "difference", "between",
-                         "suggest", "recommend", "path", "roadmap", "salary", "scope"]
-    if any(kw in text.lower() for kw in followup_keywords):
-        return None  # Send to Gemini for personalized answer
-
-    try:
-        words = nltk.word_tokenize(text.lower())
-    except Exception:
-        words = text.lower().split()
-
-    # Only match intent for simple/short introductory messages
-    if len(words) > 12:
-        return None  # Long questions go to Gemini
-
-    for intent, kw_list in CAREER_KEYWORDS.items():
-        for kw in kw_list:
-            if kw in words or kw in text.lower():
+    """Only match simple trigger phrases — everything else goes to Gemini"""
+    text_lower = text.lower().strip()
+    for intent, triggers in SIMPLE_TRIGGERS.items():
+        for trigger in triggers:
+            if trigger in text_lower:
                 return intent
-    return None
+    return None  # All other messages go to Gemini
 
 def get_gemini_response(conversation_history, api_key):
-    """Query Gemini with full conversation history for true multi-turn chat"""
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={api_key}"
     headers = {"Content-Type": "application/json"}
 
-    # Build contents from conversation history
     contents = []
     for msg in conversation_history:
         role = "user" if msg["role"] == "user" else "model"
@@ -113,8 +100,6 @@ st.markdown("""
 <style>
     .main-header { font-size: 2rem; color: #1f77b4; text-align: center; margin-bottom: 0.3rem; }
     .sub-header { text-align: center; color: #6c757d; margin-bottom: 1rem; font-size: 1rem; }
-    .user-msg { background-color: #1f77b4; color: white; padding: 10px 15px; border-radius: 18px 18px 4px 18px; margin: 5px 0; max-width: 80%; margin-left: auto; text-align: right; }
-    .bot-msg { background-color: #f0f2f6; color: #333; padding: 10px 15px; border-radius: 18px 18px 18px 4px; margin: 5px 0; max-width: 80%; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -137,11 +122,11 @@ st.sidebar.markdown("""
 Chat naturally with the AI career counsellor!
 
 **Try asking:**
-- "What career suits me if I love coding?"
+- "I love coding, what career suits me?"
 - "I enjoy art and design, what should I do?"
 - "What skills do I need for data science?"
-- "I'm confused between tech and business"
-- "What should I specialize in?"
+- "I love Python and ML, which should I specialize in?"
+- "What is the scope of AI engineering?"
 """)
 st.sidebar.markdown("---")
 if st.sidebar.button("🗑️ Clear Chat", use_container_width=True):
@@ -167,12 +152,10 @@ for msg in st.session_state["messages"]:
 
 # Chat input
 if prompt := st.chat_input("Type your message here..."):
-    # Add user message
     st.session_state["messages"].append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # Generate response
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             intent = extract_career_intent(prompt)
@@ -181,7 +164,7 @@ if prompt := st.chat_input("Type your message here..."):
             elif gemini_key:
                 response = get_gemini_response(st.session_state["messages"], gemini_key)
             else:
-                response = "Please configure your Gemini API key in Streamlit secrets to get AI-powered responses. For now, try mentioning 'coding', 'design', or 'finance' for instant recommendations!"
+                response = "Please configure your Gemini API key in Streamlit secrets to get AI-powered responses!"
             st.markdown(response)
 
     st.session_state["messages"].append({"role": "assistant", "content": response})
