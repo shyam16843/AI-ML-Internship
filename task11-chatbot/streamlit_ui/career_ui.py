@@ -46,10 +46,23 @@ Based on your interests, here are strong career paths:
 def extract_career_intent(text):
     if not text:
         return None
+    
+    # If the message is a follow-up/specific question, let Gemini handle it
+    followup_keywords = ["specialize", "specialise", "what should", "which one", 
+                         "best for me", "how to", "how do", "difference", "between",
+                         "suggest", "recommend", "path", "roadmap", "salary", "scope"]
+    if any(kw in text.lower() for kw in followup_keywords):
+        return None  # Send to Gemini for personalized answer
+
     try:
         words = nltk.word_tokenize(text.lower())
     except Exception:
         words = text.lower().split()
+
+    # Only match intent for simple/short introductory messages
+    if len(words) > 12:
+        return None  # Long questions go to Gemini
+
     for intent, kw_list in CAREER_KEYWORDS.items():
         for kw in kw_list:
             if kw in words or kw in text.lower():
