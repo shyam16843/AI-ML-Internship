@@ -67,18 +67,15 @@ def get_hf_response(text, hf_token):
     """Query Hugging Face Inference API"""
     API_URL = "https://api-inference.huggingface.co/models/google/flan-t5-large"
     headers = {"Authorization": f"Bearer {hf_token}"}
-    
-    prompt = f"""<s>[INST] You are a helpful AI career counsellor. Give practical, encouraging career advice in 3-4 sentences.
 
-User question: {text} [/INST]"""
-        payload = {
+    payload = {
         "inputs": f"You are a career counsellor. Give practical career advice in 3-4 sentences. Question: {text}",
         "parameters": {
             "max_new_tokens": 200,
             "temperature": 0.7,
         }
     }
-    
+
     try:
         response = requests.post(API_URL, headers=headers, json=payload, timeout=30)
         if response.status_code == 200:
@@ -168,9 +165,9 @@ def ask():
     user_input = st.session_state["user_input"]
     if not user_input.strip():
         return
-    
+
     intent = extract_career_intent(user_input)
-    
+
     if intent:
         st.session_state["response"] = CAREER_RECOMMENDATIONS[intent]
         st.session_state["response_type"] = "rule"
@@ -182,7 +179,7 @@ def ask():
         else:
             st.session_state["response"] = "I couldn't detect a specific career domain from your message. Try mentioning interests like 'coding', 'design', 'finance', or 'machine learning' for instant recommendations."
             st.session_state["response_type"] = "fallback"
-    
+
     st.session_state["user_input"] = ""
 
 # Input
@@ -204,5 +201,5 @@ if st.session_state.get("response"):
         st.info("**AI Career Advice:**")
     else:
         st.warning("**Guidance:**")
-    
+
     st.markdown(st.session_state["response"])
