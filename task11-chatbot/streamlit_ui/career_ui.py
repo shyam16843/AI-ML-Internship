@@ -65,7 +65,7 @@ def extract_career_intent(text):
 
 def get_hf_response(text, hf_token):
     """Query Hugging Face Inference API"""
-    API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
+    API_URL = "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta"
     headers = {"Authorization": f"Bearer {hf_token}"}
     
     prompt = f"""<s>[INST] You are a helpful AI career counsellor. Give practical, encouraging career advice in 3-4 sentences.
