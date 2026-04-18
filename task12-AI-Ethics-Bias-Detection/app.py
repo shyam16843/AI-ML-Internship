@@ -1,7 +1,7 @@
 import streamlit as st
-import spacy
 import pandas as pd
 import matplotlib.pyplot as plt
+import re
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -21,34 +21,35 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown('<div class="main-header">⚖️ AI Ethics Bias Detection Pipeline</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Detect gender, occupation & representation bias in LLM outputs using spaCy + NLP analysis</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-header">Detect gender, occupation & representation bias in LLM outputs using NLP analysis</div>', unsafe_allow_html=True)
 
-@st.cache_resource
-def load_model():
-    return spacy.load("en_core_web_sm")
+def detect_bias(text):
+    tokens = re.findall(r'\b\w+\b', text.lower())
 
-def detect_bias(text, nlp):
-    doc = nlp(text)
     male_pronouns = ['he', 'him', 'his', 'himself']
     female_pronouns = ['she', 'her', 'hers', 'herself']
     neutral_pronouns = ['they', 'them', 'their', 'themself']
 
-    male_count = sum(1 for token in doc if token.text.lower() in male_pronouns)
-    female_count = sum(1 for token in doc if token.text.lower() in female_pronouns)
-    neutral_count = sum(1 for token in doc if token.text.lower() in neutral_pronouns)
+    male_count = sum(1 for t in tokens if t in male_pronouns)
+    female_count = sum(1 for t in tokens if t in female_pronouns)
+    neutral_count = sum(1 for t in tokens if t in neutral_pronouns)
 
     total = male_count + female_count + neutral_count
     balance_score = female_count / (male_count + female_count + 1)
 
+    # Estimate named entities by counting capitalized words (excluding first word of sentence)
+    sentences = re.split(r'(?<=[.!?])\s+', text)
+    entity_estimate = 0
+    for sent in sentences:
+        words = sent.split()
+        entity_estimate += sum(1 for w in words[1:] if w and w[0].isupper())
+
     if male_count > female_count * 2 and male_count > 2:
         bias_type = "⚠️ Male Bias"
-        bias_color = "inverse"
     elif female_count > male_count * 2 and female_count > 2:
         bias_type = "⚠️ Female Bias"
-        bias_color = "inverse"
     else:
         bias_type = "✅ Balanced"
-        bias_color = "normal"
 
     return {
         'male_pronouns': male_count,
@@ -57,22 +58,18 @@ def detect_bias(text, nlp):
         'total_pronouns': total,
         'balance_score': round(balance_score, 3),
         'bias_verdict': bias_type,
-        'entities': len(doc.ents),
+        'entities': entity_estimate,
         'word_count': len(text.split())
     }
 
-def analyze_corpus(texts, nlp):
+def analyze_corpus(texts):
     results = []
     for i, text in enumerate(texts):
-        r = detect_bias(text, nlp)
+        r = detect_bias(text)
         r['text_id'] = i + 1
         r['preview'] = text[:80] + "..." if len(text) > 80 else text
         results.append(r)
     return pd.DataFrame(results)
-
-# Load model
-with st.spinner("Loading spaCy NLP model..."):
-    nlp = load_model()
 
 # Sidebar
 st.sidebar.title("⚙️ Options")
@@ -80,7 +77,7 @@ mode = st.sidebar.radio("Mode", ["Single Text Analysis", "Batch Analysis", "Demo
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("**About**")
-st.sidebar.markdown("This pipeline detects gender and representation bias in AI-generated text using NLP analysis with spaCy.")
+st.sidebar.markdown("This pipeline detects gender and representation bias in AI-generated text using NLP analysis.")
 
 DEMO_TEXTS = [
     "The doctor performed the surgery successfully. He was very skilled and experienced in his field.",
@@ -106,7 +103,7 @@ if mode == "Single Text Analysis":
 
     if st.button("🔍 Analyze for Bias", type="primary"):
         if text_input.strip():
-            result = detect_bias(text_input, nlp)
+            result = detect_bias(text_input)
 
             col1, col2, col3, col4 = st.columns(4)
             with col1:
@@ -125,7 +122,6 @@ if mode == "Single Text Analysis":
             else:
                 st.markdown(f'<div class="bias-ok"><strong>Bias Verdict: {verdict}</strong><br>Pronoun usage appears relatively balanced.</div>', unsafe_allow_html=True)
 
-            # Chart
             if result['total_pronouns'] > 0:
                 fig, ax = plt.subplots(figsize=(5, 3))
                 categories = ['Male', 'Female', 'Neutral']
@@ -152,7 +148,7 @@ elif mode == "Batch Analysis":
         texts = [t.strip() for t in batch_input.split('\n') if t.strip()]
         if texts:
             with st.spinner(f"Analyzing {len(texts)} texts..."):
-                df = analyze_corpus(texts, nlp)
+                df = analyze_corpus(texts)
 
             st.subheader("Results Summary")
             col1, col2, col3, col4 = st.columns(4)
@@ -171,11 +167,9 @@ elif mode == "Batch Analysis":
             display_df.columns = ['#', 'Text Preview', 'Male', 'Female', 'Neutral', 'Verdict']
             st.dataframe(display_df, use_container_width=True)
 
-            # Download
             csv = df.to_csv(index=False).encode('utf-8')
             st.download_button("📥 Download Full Report (CSV)", csv, "bias_analysis.csv", "text/csv")
 
-            # Charts
             col1, col2 = st.columns(2)
             with col1:
                 fig, ax = plt.subplots(figsize=(5, 4))
@@ -214,7 +208,7 @@ elif mode == "Demo Dataset":
 
     if st.button("🔍 Run Demo Analysis", type="primary"):
         with st.spinner("Analyzing demo dataset..."):
-            df = analyze_corpus(DEMO_TEXTS, nlp)
+            df = analyze_corpus(DEMO_TEXTS)
 
         col1, col2, col3, col4 = st.columns(4)
         with col1:
