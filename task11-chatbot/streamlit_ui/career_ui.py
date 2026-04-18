@@ -60,31 +60,33 @@ def extract_career_intent(text):
                 return intent
     return None
 
-def get_hf_response(text, hf_token):
-    API_URL = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill"
-    headers = {"Authorization": f"Bearer {hf_token}"}
-    payload = {"inputs": f"I need career advice. {text}"}
+def get_gemini_response(text, api_key):
+    """Query Google Gemini API - free and reliable"""
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+    headers = {"Content-Type": "application/json"}
+    payload = {
+        "contents": [{
+            "parts": [{
+                "text": f"You are a helpful AI career counsellor. Give practical, encouraging career advice in 3-4 sentences.\n\nUser question: {text}"
+            }]
+        }]
+    }
 
     try:
-        response = requests.post(API_URL, headers=headers, json=payload, timeout=30)
+        response = requests.post(url, headers=headers, json=payload, timeout=30)
         if response.status_code == 200:
             result = response.json()
-            if isinstance(result, dict) and "generated_text" in result:
-                return result["generated_text"].strip()
-            elif isinstance(result, list) and len(result) > 0:
-                return result[0].get('generated_text', '').strip()
-            return "I received a response but couldn't parse it. Please try again."
-        elif response.status_code == 503:
-            return "⏳ The AI model is loading. Please click Ask again in 20 seconds."
-        elif response.status_code == 401:
-            return "❌ Invalid Hugging Face token. Please check your Streamlit secrets."
+            return result["candidates"][0]["content"]["parts"][0]["text"].strip()
+        elif response.status_code == 400:
+            return "❌ Invalid API key. Please check your Gemini API key in Streamlit secrets."
         else:
             return f"❌ API error {response.status_code}. Please try again."
     except requests.exceptions.Timeout:
-        return "⏳ Request timed out. Please try again in 20 seconds."
+        return "⏳ Request timed out. Please try again."
     except Exception as e:
-        return f"❌ Connection error: {str(e)}"
+        return f"❌ Error: {str(e)}"
 
+# Page config
 st.set_page_config(page_title="AI Virtual Career Counsellor", page_icon="🎯", layout="centered")
 
 st.markdown("""
@@ -95,23 +97,25 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown('<div class="main-header">🎯 AI Virtual Career Counsellor</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Get personalized career guidance powered by NLP + AI</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-header">Get personalized career guidance powered by NLP + Gemini AI</div>', unsafe_allow_html=True)
 
-hf_token = None
+# Get Gemini API key from Streamlit secrets
+gemini_key = None
 try:
-    hf_token = st.secrets["HF_TOKEN"]
+    gemini_key = st.secrets["GEMINI_API_KEY"]
 except Exception:
     pass
 
-if not hf_token:
-    st.warning("⚠️ Hugging Face API token not configured. Rule-based recommendations will still work.")
+if not gemini_key:
+    st.warning("⚠️ Gemini API key not configured. Rule-based recommendations will still work.")
 
+# Sidebar
 st.sidebar.title("💡 How to use")
 st.sidebar.markdown("""
 1. Type your interests or career question
 2. Click **Ask** to get recommendations
 3. For tech/arts/commerce topics, you get instant recommendations
-4. For other questions, the AI generates personalized advice
+4. For other questions, Gemini AI generates personalized advice
 
 **Example questions:**
 - "I love Python and machine learning"
@@ -123,6 +127,7 @@ st.sidebar.markdown("---")
 st.sidebar.markdown("**Built by Ghanashyam T V**")
 st.sidebar.markdown("[GitHub](https://github.com/shyam16843) | [LinkedIn](https://linkedin.com/in/ghanashyam-tv)")
 
+# Sample questions
 st.markdown("**Try these:**")
 col1, col2, col3 = st.columns(3)
 with col1:
@@ -137,6 +142,7 @@ with col3:
 
 st.markdown("---")
 
+# Initialize session state
 if "user_input" not in st.session_state:
     st.session_state["user_input"] = ""
 if "response" not in st.session_state:
@@ -153,9 +159,9 @@ def ask():
         st.session_state["response"] = CAREER_RECOMMENDATIONS[intent]
         st.session_state["response_type"] = "rule"
     else:
-        if hf_token:
-            with st.spinner("AI is thinking..."):
-                st.session_state["response"] = get_hf_response(user_input, hf_token)
+        if gemini_key:
+            with st.spinner("Gemini AI is thinking..."):
+                st.session_state["response"] = get_gemini_response(user_input, gemini_key)
                 st.session_state["response_type"] = "llm"
         else:
             st.session_state["response"] = "Try mentioning 'coding', 'design', 'finance', or 'machine learning' for instant recommendations."
