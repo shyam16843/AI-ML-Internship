@@ -172,17 +172,20 @@ elif mode == "Batch Analysis":
 
             col1, col2 = st.columns(2)
             with col1:
-                fig, ax = plt.subplots(figsize=(5, 4))
                 total_m = df['male_pronouns'].sum()
                 total_f = df['female_pronouns'].sum()
                 total_n = df['neutral_pronouns'].sum()
-                ax.pie([total_m, total_f, total_n],
-                       labels=['Male', 'Female', 'Neutral'],
-                       colors=['#4e79a7', '#f28e2b', '#76b7b2'],
-                       autopct='%1.1f%%')
-                ax.set_title('Overall Pronoun Distribution')
-                st.pyplot(fig)
-                plt.close()
+                if total_m + total_f + total_n > 0:
+                    fig, ax = plt.subplots(figsize=(5, 4))
+                    ax.pie([total_m, total_f, total_n],
+                           labels=['Male', 'Female', 'Neutral'],
+                           colors=['#4e79a7', '#f28e2b', '#76b7b2'],
+                           autopct='%1.1f%%')
+                    ax.set_title('Overall Pronoun Distribution')
+                    st.pyplot(fig)
+                    plt.close()
+                else:
+                    st.info("No pronouns detected — pie chart unavailable.")
 
             with col2:
                 fig, ax = plt.subplots(figsize=(5, 4))
@@ -235,14 +238,18 @@ elif mode == "Demo Dataset":
 
         col1, col2 = st.columns(2)
         with col1:
-            fig, ax = plt.subplots(figsize=(5, 4))
-            ax.pie([total_m, total_f, df['neutral_pronouns'].sum()],
-                   labels=['Male', 'Female', 'Neutral'],
-                   colors=['#4e79a7', '#f28e2b', '#76b7b2'],
-                   autopct='%1.1f%%', startangle=140)
-            ax.set_title('Pronoun Distribution Across Dataset')
-            st.pyplot(fig)
-            plt.close()
+            total_n = df['neutral_pronouns'].sum()
+            if total_m + total_f + total_n > 0:
+                fig, ax = plt.subplots(figsize=(5, 4))
+                ax.pie([total_m, total_f, total_n],
+                       labels=['Male', 'Female', 'Neutral'],
+                       colors=['#4e79a7', '#f28e2b', '#76b7b2'],
+                       autopct='%1.1f%%', startangle=140)
+                ax.set_title('Pronoun Distribution Across Dataset')
+                st.pyplot(fig)
+                plt.close()
+            else:
+                st.info("No pronouns detected — pie chart unavailable.")
 
         with col2:
             fig, ax = plt.subplots(figsize=(5, 4))
