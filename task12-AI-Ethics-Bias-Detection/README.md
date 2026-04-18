@@ -1,5 +1,3 @@
-Here’s a tailored `README.md` structure for your **AI Ethics Bias Detection & Mitigation Pipeline**, modeled after the example you provided but focused for your project and results:
-
 ***
 
 # AI Ethics Bias Detection & Mitigation Pipeline
