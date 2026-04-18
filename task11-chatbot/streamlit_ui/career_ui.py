@@ -2,7 +2,6 @@ import streamlit as st
 import requests
 import nltk
 
-# Download nltk data
 nltk.download('punkt', quiet=True)
 nltk.download('punkt_tab', quiet=True)
 
@@ -16,7 +15,6 @@ CAREER_RECOMMENDATIONS = {
     "tech": """🖥️ **Tech Career Recommendations**
 
 Based on your interests, here are strong career paths:
-
 - **Software Engineer** — Build applications and systems
 - **Data Scientist / ML Engineer** — Work with AI and machine learning
 - **Web Developer** — Frontend, backend, or full-stack development
@@ -27,7 +25,6 @@ Based on your interests, here are strong career paths:
     "arts": """🎨 **Arts & Creative Career Recommendations**
 
 Based on your interests, here are strong career paths:
-
 - **Graphic Designer / UI-UX Designer** — Visual design for apps and websites
 - **Content Writer / Copywriter** — Writing for brands and media
 - **Musician / Music Producer** — Performance or studio work
@@ -38,7 +35,6 @@ Based on your interests, here are strong career paths:
     "commerce": """💼 **Commerce & Business Career Recommendations**
 
 Based on your interests, here are strong career paths:
-
 - **Financial Analyst** — Investment and financial planning
 - **Marketing Specialist** — Digital marketing and brand strategy
 - **Business Analyst** — Bridging business and technology
@@ -60,16 +56,25 @@ def extract_career_intent(text):
                 return intent
     return None
 
-def get_gemini_response(text, api_key):
-    """Query Google Gemini API - free and reliable"""
+def get_gemini_response(conversation_history, api_key):
+    """Query Gemini with full conversation history for true multi-turn chat"""
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={api_key}"
     headers = {"Content-Type": "application/json"}
+
+    # Build contents from conversation history
+    contents = []
+    for msg in conversation_history:
+        role = "user" if msg["role"] == "user" else "model"
+        contents.append({
+            "role": role,
+            "parts": [{"text": msg["content"]}]
+        })
+
     payload = {
-        "contents": [{
-            "parts": [{
-                "text": f"You are a helpful AI career counsellor. Give practical, encouraging career advice in 3-4 sentences.\n\nUser question: {text}"
-            }]
-        }]
+        "system_instruction": {
+            "parts": [{"text": "You are a friendly and expert AI career counsellor. Give practical, encouraging, and personalized career advice. Keep responses concise (3-5 sentences). Ask follow-up questions to better understand the user's background and goals."}]
+        },
+        "contents": contents
     }
 
     try:
@@ -77,6 +82,8 @@ def get_gemini_response(text, api_key):
         if response.status_code == 200:
             result = response.json()
             return result["candidates"][0]["content"]["parts"][0]["text"].strip()
+        elif response.status_code == 429:
+            return "⏳ Rate limit reached. Please wait a moment and try again."
         elif response.status_code == 400:
             return "❌ Invalid API key. Please check your Gemini API key in Streamlit secrets."
         else:
@@ -87,19 +94,21 @@ def get_gemini_response(text, api_key):
         return f"❌ Error: {str(e)}"
 
 # Page config
-st.set_page_config(page_title="AI Virtual Career Counsellor", page_icon="🎯", layout="centered")
+st.set_page_config(page_title="AI Career Counsellor", page_icon="🎯", layout="centered")
 
 st.markdown("""
 <style>
-    .main-header { font-size: 2rem; color: #1f77b4; text-align: center; margin-bottom: 0.5rem; }
-    .sub-header { text-align: center; color: #6c757d; margin-bottom: 2rem; font-size: 1rem; }
+    .main-header { font-size: 2rem; color: #1f77b4; text-align: center; margin-bottom: 0.3rem; }
+    .sub-header { text-align: center; color: #6c757d; margin-bottom: 1rem; font-size: 1rem; }
+    .user-msg { background-color: #1f77b4; color: white; padding: 10px 15px; border-radius: 18px 18px 4px 18px; margin: 5px 0; max-width: 80%; margin-left: auto; text-align: right; }
+    .bot-msg { background-color: #f0f2f6; color: #333; padding: 10px 15px; border-radius: 18px 18px 18px 4px; margin: 5px 0; max-width: 80%; }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="main-header">🎯 AI Virtual Career Counsellor</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Get personalized career guidance powered by NLP + Gemini AI</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header">🎯 AI Career Counsellor</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-header">Your personal career guidance chatbot powered by Gemini AI</div>', unsafe_allow_html=True)
 
-# Get Gemini API key from Streamlit secrets
+# Get Gemini API key
 gemini_key = None
 try:
     gemini_key = st.secrets["GEMINI_API_KEY"]
@@ -107,82 +116,59 @@ except Exception:
     pass
 
 if not gemini_key:
-    st.warning("⚠️ Gemini API key not configured. Rule-based recommendations will still work.")
+    st.warning("⚠️ Gemini API key not configured. Add GEMINI_API_KEY to Streamlit secrets.")
 
 # Sidebar
 st.sidebar.title("💡 How to use")
 st.sidebar.markdown("""
-1. Type your interests or career question
-2. Click **Ask** to get recommendations
-3. For tech/arts/commerce topics, you get instant recommendations
-4. For other questions, Gemini AI generates personalized advice
+Chat naturally with the AI career counsellor!
 
-**Example questions:**
-- "I love Python and machine learning"
-- "I enjoy creative writing and design"
-- "I'm interested in finance and business"
+**Try asking:**
+- "What career suits me if I love coding?"
+- "I enjoy art and design, what should I do?"
 - "What skills do I need for data science?"
+- "I'm confused between tech and business"
+- "What should I specialize in?"
 """)
+st.sidebar.markdown("---")
+if st.sidebar.button("🗑️ Clear Chat", use_container_width=True):
+    st.session_state["messages"] = []
+    st.rerun()
 st.sidebar.markdown("---")
 st.sidebar.markdown("**Built by Ghanashyam T V**")
 st.sidebar.markdown("[GitHub](https://github.com/shyam16843) | [LinkedIn](https://linkedin.com/in/ghanashyam-tv)")
 
-# Sample questions
-st.markdown("**Try these:**")
-col1, col2, col3 = st.columns(3)
-with col1:
-    if st.button("💻 I love coding and AI", use_container_width=True):
-        st.session_state["user_input"] = "I love coding and AI"
-with col2:
-    if st.button("🎨 I enjoy art and design", use_container_width=True):
-        st.session_state["user_input"] = "I enjoy art and design"
-with col3:
-    if st.button("💼 I'm into business and finance", use_container_width=True):
-        st.session_state["user_input"] = "I'm into business and finance"
+# Initialize chat history
+if "messages" not in st.session_state:
+    st.session_state["messages"] = [
+        {
+            "role": "assistant",
+            "content": "👋 Hi! I'm your AI Career Counsellor. Tell me about your interests, skills, or what you're passionate about — and I'll help guide you toward the right career path. What would you like to explore today?"
+        }
+    ]
 
-st.markdown("---")
+# Display chat history
+for msg in st.session_state["messages"]:
+    with st.chat_message(msg["role"]):
+        st.markdown(msg["content"])
 
-# Initialize session state
-if "user_input" not in st.session_state:
-    st.session_state["user_input"] = ""
-if "response" not in st.session_state:
-    st.session_state["response"] = ""
-if "response_type" not in st.session_state:
-    st.session_state["response_type"] = ""
+# Chat input
+if prompt := st.chat_input("Type your message here..."):
+    # Add user message
+    st.session_state["messages"].append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
 
-def ask():
-    user_input = st.session_state["user_input"]
-    if not user_input.strip():
-        return
-    intent = extract_career_intent(user_input)
-    if intent:
-        st.session_state["response"] = CAREER_RECOMMENDATIONS[intent]
-        st.session_state["response_type"] = "rule"
-    else:
-        if gemini_key:
-            with st.spinner("Gemini AI is thinking..."):
-                st.session_state["response"] = get_gemini_response(user_input, gemini_key)
-                st.session_state["response_type"] = "llm"
-        else:
-            st.session_state["response"] = "Try mentioning 'coding', 'design', 'finance', or 'machine learning' for instant recommendations."
-            st.session_state["response_type"] = "fallback"
-    st.session_state["user_input"] = ""
+    # Generate response
+    with st.chat_message("assistant"):
+        with st.spinner("Thinking..."):
+            intent = extract_career_intent(prompt)
+            if intent:
+                response = CAREER_RECOMMENDATIONS[intent]
+            elif gemini_key:
+                response = get_gemini_response(st.session_state["messages"], gemini_key)
+            else:
+                response = "Please configure your Gemini API key in Streamlit secrets to get AI-powered responses. For now, try mentioning 'coding', 'design', or 'finance' for instant recommendations!"
+            st.markdown(response)
 
-user_input = st.text_area(
-    "Tell me about your interests and background:",
-    key="user_input",
-    height=120,
-    placeholder="e.g. I love working with data and Python, and I'm interested in machine learning..."
-)
-
-st.button("🎯 Ask", on_click=ask, type="primary", use_container_width=True)
-
-if st.session_state.get("response"):
-    st.markdown("---")
-    if st.session_state["response_type"] == "rule":
-        st.success("**Career Recommendation:**")
-    elif st.session_state["response_type"] == "llm":
-        st.info("**AI Career Advice:**")
-    else:
-        st.warning("**Guidance:**")
-    st.markdown(st.session_state["response"])
+    st.session_state["messages"].append({"role": "assistant", "content": response})
