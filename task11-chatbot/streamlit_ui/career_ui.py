@@ -79,7 +79,7 @@ def get_groq_response(conversation_history, api_key):
             messages.append({"role": "assistant", "content": msg["content"]})
 
     payload = {
-        "model": "llama3-8b-8192",
+        "model": "llama-3.3-70b-versatile",
         "messages": messages,
         "max_tokens": 300,
         "temperature": 0.7
