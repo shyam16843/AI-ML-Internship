@@ -119,8 +119,9 @@ st.markdown('<div class="sub-header">Your personal career guidance chatbot power
 groq_key = None
 try:
     groq_key = st.secrets["GROQ_API_KEY"]
-except Exception:
-    pass
+    st.sidebar.success(f"Key loaded: {groq_key[:8]}...")
+except Exception as e:
+    st.sidebar.error(f"Secret error: {e}")
 
 if not groq_key:
     st.warning("⚠️ Groq API key not configured. Add GROQ_API_KEY to Streamlit secrets.")
