@@ -37,9 +37,8 @@ Based on your interests, here are strong career paths:
 **Next steps:** Get certified (CFA, Google Digital Marketing), build Excel/data skills, network on LinkedIn."""
 }
 
-# Only trigger rule-based response for very simple one-topic messages
 SIMPLE_TRIGGERS = {
-    "tech": ["i love coding", "i like coding", "i enjoy coding", "i love programming", 
+    "tech": ["i love coding", "i like coding", "i enjoy coding", "i love programming",
              "i like programming", "i love software", "i like software", "i love computers",
              "i am a developer", "i want to be a developer"],
     "arts": ["i love art", "i like art", "i enjoy art", "i love design", "i like design",
@@ -50,42 +49,52 @@ SIMPLE_TRIGGERS = {
 }
 
 def extract_career_intent(text):
-    """Only match simple trigger phrases — everything else goes to Gemini"""
     text_lower = text.lower().strip()
     for intent, triggers in SIMPLE_TRIGGERS.items():
         for trigger in triggers:
             if trigger in text_lower:
                 return intent
-    return None  # All other messages go to Gemini
+    return None
 
-def get_gemini_response(conversation_history, api_key):
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={api_key}"
-    headers = {"Content-Type": "application/json"}
+def get_groq_response(conversation_history, api_key):
+    """Query Groq API - free, fast, no rate limit issues"""
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
 
-    contents = []
+    messages = [
+        {
+            "role": "system",
+            "content": "You are a friendly and expert AI career counsellor. Give practical, encouraging, and personalized career advice. Keep responses concise (3-5 sentences). Ask follow-up questions to better understand the user's background and goals."
+        }
+    ]
+
+    # Add conversation history (skip the initial greeting)
     for msg in conversation_history:
-        role = "user" if msg["role"] == "user" else "model"
-        contents.append({
-            "role": role,
-            "parts": [{"text": msg["content"]}]
-        })
+        if msg["role"] in ["user", "assistant"]:
+            messages.append({
+                "role": msg["role"],
+                "content": msg["content"]
+            })
 
     payload = {
-        "system_instruction": {
-            "parts": [{"text": "You are a friendly and expert AI career counsellor. Give practical, encouraging, and personalized career advice. Keep responses concise (3-5 sentences). Ask follow-up questions to better understand the user's background and goals."}]
-        },
-        "contents": contents
+        "model": "llama3-8b-8192",
+        "messages": messages,
+        "max_tokens": 300,
+        "temperature": 0.7
     }
 
     try:
         response = requests.post(url, headers=headers, json=payload, timeout=30)
         if response.status_code == 200:
             result = response.json()
-            return result["candidates"][0]["content"]["parts"][0]["text"].strip()
+            return result["choices"][0]["message"]["content"].strip()
         elif response.status_code == 429:
             return "⏳ Rate limit reached. Please wait a moment and try again."
-        elif response.status_code == 400:
-            return "❌ Invalid API key. Please check your Gemini API key in Streamlit secrets."
+        elif response.status_code == 401:
+            return "❌ Invalid Groq API key. Please check your Streamlit secrets."
         else:
             return f"❌ API error {response.status_code}. Please try again."
     except requests.exceptions.Timeout:
@@ -104,17 +113,17 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown('<div class="main-header">🎯 AI Career Counsellor</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Your personal career guidance chatbot powered by Gemini AI</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-header">Your personal career guidance chatbot powered by Groq AI</div>', unsafe_allow_html=True)
 
-# Get Gemini API key
-gemini_key = None
+# Get Groq API key
+groq_key = None
 try:
-    gemini_key = st.secrets["GEMINI_API_KEY"]
+    groq_key = st.secrets["GROQ_API_KEY"]
 except Exception:
     pass
 
-if not gemini_key:
-    st.warning("⚠️ Gemini API key not configured. Add GEMINI_API_KEY to Streamlit secrets.")
+if not groq_key:
+    st.warning("⚠️ Groq API key not configured. Add GROQ_API_KEY to Streamlit secrets.")
 
 # Sidebar
 st.sidebar.title("💡 How to use")
@@ -161,10 +170,10 @@ if prompt := st.chat_input("Type your message here..."):
             intent = extract_career_intent(prompt)
             if intent:
                 response = CAREER_RECOMMENDATIONS[intent]
-            elif gemini_key:
-                response = get_gemini_response(st.session_state["messages"], gemini_key)
+            elif groq_key:
+                response = get_groq_response(st.session_state["messages"], groq_key)
             else:
-                response = "Please configure your Gemini API key in Streamlit secrets to get AI-powered responses!"
+                response = "Please configure your Groq API key in Streamlit secrets to get AI-powered responses!"
             st.markdown(response)
 
     st.session_state["messages"].append({"role": "assistant", "content": response})
