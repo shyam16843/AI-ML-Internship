@@ -57,13 +57,13 @@ def extract_career_intent(text):
     return None
 
 def get_groq_response(conversation_history, api_key):
-    """Query Groq API - free, fast, no rate limit issues"""
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
 
+    # Start with system message
     messages = [
         {
             "role": "system",
@@ -71,13 +71,12 @@ def get_groq_response(conversation_history, api_key):
         }
     ]
 
-    # Add conversation history (skip the initial greeting)
-    for msg in conversation_history:
-        if msg["role"] in ["user", "assistant"]:
-            messages.append({
-                "role": msg["role"],
-                "content": msg["content"]
-            })
+    # Skip index 0 (initial greeting), only add real conversation
+    for msg in conversation_history[1:]:
+        if msg["role"] == "user":
+            messages.append({"role": "user", "content": msg["content"]})
+        elif msg["role"] == "assistant":
+            messages.append({"role": "assistant", "content": msg["content"]})
 
     payload = {
         "model": "llama3-8b-8192",
@@ -96,7 +95,7 @@ def get_groq_response(conversation_history, api_key):
         elif response.status_code == 401:
             return "❌ Invalid Groq API key. Please check your Streamlit secrets."
         else:
-            return f"❌ API error {response.status_code}. Please try again."
+            return f"❌ API error {response.status_code}: {response.text}"
     except requests.exceptions.Timeout:
         return "⏳ Request timed out. Please try again."
     except Exception as e:
@@ -119,9 +118,8 @@ st.markdown('<div class="sub-header">Your personal career guidance chatbot power
 groq_key = None
 try:
     groq_key = st.secrets["GROQ_API_KEY"]
-    st.sidebar.success(f"Key loaded: {groq_key[:8]}...")
-except Exception as e:
-    st.sidebar.error(f"Secret error: {e}")
+except Exception:
+    pass
 
 if not groq_key:
     st.warning("⚠️ Groq API key not configured. Add GROQ_API_KEY to Streamlit secrets.")
@@ -178,3 +176,4 @@ if prompt := st.chat_input("Type your message here..."):
             st.markdown(response)
 
     st.session_state["messages"].append({"role": "assistant", "content": response})
+
