@@ -1,0 +1,50 @@
+version: "3.1"
+
+stories:
+
+- story: happy path
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: mood_great
+  - action: utter_happy
+
+- story: sad path 1
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: mood_unhappy
+  - action: utter_cheer_up
+  - action: utter_did_that_help
+  - intent: affirm
+  - action: utter_happy
+
+- story: sad path 2
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: mood_unhappy
+  - action: utter_cheer_up
+  - action: utter_did_that_help
+  - intent: deny
+  - action: utter_goodbye
+- story: tech path
+  steps:
+  - intent: ask_tech
+  - action: utter_tech_careers
+
+- story: arts path
+  steps:
+  - intent: ask_arts
+  - action: utter_arts_careers
+
+- story: commerce path
+  steps:
+  - intent: ask_commerce
+  - action: utter_commerce_careers
+
+- story: fallback example
+  steps:
+  - intent: fallback
+  - action: utter_fallback
+  - action: action_career_ollama_fallback

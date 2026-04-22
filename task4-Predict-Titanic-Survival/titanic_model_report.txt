@@ -1,0 +1,52 @@
+
+TITANIC SURVIVAL PREDICTION PROJECT REPORT
+==================================================
+Generated on: 2025-09-16 21:28:45
+
+PROJECT OVERVIEW:
+- Dataset: Titanic passenger data (n=358)
+- Target variable: Survival (0 = Did not survive, 1 = Survived)
+- Best model: LogisticRegression
+- Final test accuracy: 0.8492
+
+DATA PREPROCESSING:
+- Handled missing values in Age and Embarked
+- Encoded categorical variables (Sex, Embarked)
+- Created new features: FamilySize, IsAlone, AgeGroup, FarePerPerson, Title
+- Scaled numerical features: Age, Fare, FarePerPerson, SibSp, Parch, FamilySize
+
+MODEL PERFORMANCE:
+- Accuracy: 0.8492
+- Precision: 0.8387
+- Recall: 0.7536
+- F1-Score: 0.7939
+- ROC AUC: 0.8794
+
+KEY INSIGHTS:
+1. Most important predictive factors:
+         Feature  Importance
+1            Sex    2.395521
+17  Title_Master    2.227961
+0         Pclass    1.041522
+20     Title_Mrs    0.605016
+9     FamilySize    0.506134
+
+2. Model confidence:
+- High confidence predictions: 42/179
+- Low confidence predictions: 100/179
+- Uncertain predictions: 37/179
+
+3. Demographic patterns confirmed:
+- Women had significantly higher survival rates
+- Children were prioritized for rescue
+- Higher-class passengers had better survival chances
+
+RECOMMENDATIONS:
+1. The model can predict survival with 84.9% accuracy
+2. Most reliable for female passengers and children
+3. Use for historical analysis and educational purposes
+
+MODEL LIMITATIONS:
+- Based on historical data from 1912
+- Limited by available passenger information
+- Some demographic groups have small sample sizes

@@ -1,0 +1,14 @@
+# requirements.txt
+# Python package dependencies for California Housing Price Prediction
+
+# Core data science libraries
+numpy>=1.21.0
+pandas>=1.3.0
+matplotlib>=3.5.0
+seaborn>=0.11.0
+
+# Machine learning
+scikit-learn>=1.0.0
+
+# Jupyter for development
+jupyter>=1.0.0
