@@ -26,7 +26,9 @@ st.markdown('<div class="sub-header">Time Series Forecasting with ARIMA/SARIMA â
 
 @st.cache_data
 def load_data():
-    df = pd.read_csv("AAPL.csv")
+    import os
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    df = pd.read_csv(os.path.join(base_dir, "AAPL.csv"))
     df = df.rename(columns={
         'Date': 'date', 'Open': 'open', 'High': 'high',
         'Low': 'low', 'Close': 'close', 'Volume': 'volume'
