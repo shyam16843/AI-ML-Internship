@@ -53,12 +53,12 @@ def run_forecast(series):
     return model, train, test, forecast
 
 @st.cache_resource
-def run_future_forecast(_model, test_index):
+def run_future_forecast(_model, _test_index):
     from pandas.tseries.offsets import BDay
     future_forecast = _model.get_forecast(steps=30)
     future_values = future_forecast.predicted_mean
     conf_int = future_forecast.conf_int()
-    future_dates = pd.date_range(start=test_index[-1] + BDay(1), periods=30, freq='B')
+    future_dates = pd.date_range(start=_test_index[-1] + BDay(1), periods=30, freq='B')
     return future_dates, future_values, conf_int
 
 def calculate_metrics(actual, predicted):
