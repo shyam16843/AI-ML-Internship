@@ -41,46 +41,60 @@ def load_data():
 @st.cache_resource
 def run_forecast(_series):
     import pmdarima as pm
+    from statsmodels.tsa.statespace.sarimax import SARIMAX
+
     series = _series
+    train_len = int(len(series) * 0.8)
+    train, test = series[:train_len], series[train_len:]
 
-    # Use log transformation for better stationarity
-    log_series = np.log(series)
-
-    train_len = int(len(log_series) * 0.8)
-    train, test = log_series[:train_len], log_series[train_len:]
+    # Use returns (% change) for stationarity
+    train_returns = train.pct_change().dropna()
 
     model = pm.auto_arima(
-        train,
+        train_returns,
         seasonal=False,
         stepwise=True,
         error_action='ignore',
         suppress_warnings=True,
-        d=1
+        d=0  # already stationary as returns
     )
 
-    # Forecast on log scale
-    log_forecast = model.predict(n_periods=len(test))
+    # Forecast returns
+    forecast_returns = model.predict(n_periods=len(test))
 
-    # Inverse transform back to price scale
-    forecast = np.exp(log_forecast)
-    actual_test = np.exp(test)
+    # Convert returns back to prices
+    last_train_price = train.iloc[-1]
+    forecast_prices = [last_train_price]
+    for r in forecast_returns:
+        forecast_prices.append(forecast_prices[-1] * (1 + r))
+    forecast_prices = forecast_prices[1:]  # remove seed price
 
-    forecast = pd.Series(forecast, index=actual_test.index)
-    return model, np.exp(train), actual_test, forecast, log_series
+    forecast = pd.Series(forecast_prices, index=test.index)
+    return model, train, test, forecast
 
-def run_future_forecast(model, last_log_value, test_index, forecast_days=30):
+def run_future_forecast(model, last_price, test_index, forecast_days=30):
     from pandas.tseries.offsets import BDay
 
-    # Predict on log scale
-    log_future, conf_int_array = model.predict(n_periods=forecast_days, return_conf_int=True)
+    # Predict future returns
+    future_returns, conf_int_array = model.predict(n_periods=forecast_days, return_conf_int=True)
 
-    # Inverse transform
-    future_values = pd.Series(np.exp(log_future))
-    conf_int = pd.DataFrame({
-        'lower': np.exp(conf_int_array[:, 0]),
-        'upper': np.exp(conf_int_array[:, 1])
-    })
+    # Convert returns to prices
+    future_prices = [last_price]
+    for r in future_returns:
+        future_prices.append(future_prices[-1] * (1 + r))
+    future_prices = future_prices[1:]
 
+    # Convert CI returns to prices
+    lower_prices = [last_price]
+    upper_prices = [last_price]
+    for i in range(forecast_days):
+        lower_prices.append(lower_prices[-1] * (1 + conf_int_array[i, 0]))
+        upper_prices.append(upper_prices[-1] * (1 + conf_int_array[i, 1]))
+    lower_prices = lower_prices[1:]
+    upper_prices = upper_prices[1:]
+
+    future_values = pd.Series(future_prices)
+    conf_int = pd.DataFrame({'lower': lower_prices, 'upper': upper_prices})
     future_dates = pd.date_range(start=test_index[-1] + BDay(1), periods=forecast_days, freq='B')
     return future_dates, future_values, conf_int
 
@@ -100,7 +114,7 @@ threshold = st.sidebar.slider("BUY signal threshold (%)", 0.5, 5.0, 1.0) / 100
 show_volume = st.sidebar.checkbox("Show Volume Chart", value=True)
 st.sidebar.markdown("---")
 st.sidebar.markdown("**About**")
-st.sidebar.markdown("Uses Auto-ARIMA with log transformation to forecast AAPL stock prices and generate BUY/HOLD signals.")
+st.sidebar.markdown("Uses Auto-ARIMA on daily returns to forecast AAPL stock prices and generate BUY/HOLD signals.")
 st.sidebar.markdown("---")
 st.sidebar.markdown("**Built by Ghanashyam T V**")
 st.sidebar.markdown("[GitHub](https://github.com/shyam16843) | [LinkedIn](https://linkedin.com/in/ghanashyam-tv)")
@@ -160,13 +174,12 @@ if st.button("▶️ Run Forecast", type="primary", use_container_width=True):
     with st.spinner("Training Auto-ARIMA model... this may take 1-2 minutes ⏳"):
         try:
             series = df['close'].dropna()
-            model, train, test, forecast, log_series = run_forecast(series)
+            model, train, test, forecast = run_forecast(series)
             metrics = calculate_metrics(test, forecast)
 
-            # Get last log value for future forecast
-            last_log_value = np.log(series.iloc[-1])
+            last_price = series.iloc[-1]
             future_dates, future_values, conf_int = run_future_forecast(
-                model, last_log_value, test.index, forecast_days
+                model, last_price, test.index, forecast_days
             )
 
             # Metrics
@@ -219,15 +232,14 @@ if st.button("▶️ Run Forecast", type="primary", use_container_width=True):
 
             # BUY / HOLD signal
             st.subheader("💡 Trading Signal")
-            latest_price = series.iloc[-1]
             avg_forecast = future_values[:5].mean()
-            change_pct = (avg_forecast - latest_price) / latest_price
+            change_pct = (avg_forecast - last_price) / last_price
 
             if change_pct > threshold:
                 st.markdown(f"""
                 <div class="buy-signal">
                     <strong>🟢 BUY SIGNAL</strong><br>
-                    Current Price: <strong>${latest_price:.2f}</strong><br>
+                    Current Price: <strong>${last_price:.2f}</strong><br>
                     Avg Forecast (Next 5 days): <strong>${avg_forecast:.2f}</strong><br>
                     Expected Change: <strong>+{change_pct*100:.2f}%</strong><br>
                     The model predicts upward movement above the {threshold*100:.1f}% threshold.
@@ -237,7 +249,7 @@ if st.button("▶️ Run Forecast", type="primary", use_container_width=True):
                 st.markdown(f"""
                 <div class="hold-signal">
                     <strong>🟡 HOLD / NO BUY SIGNAL</strong><br>
-                    Current Price: <strong>${latest_price:.2f}</strong><br>
+                    Current Price: <strong>${last_price:.2f}</strong><br>
                     Avg Forecast (Next 5 days): <strong>${avg_forecast:.2f}</strong><br>
                     Expected Change: <strong>{change_pct*100:.2f}%</strong><br>
                     The model does not predict sufficient upward movement.
