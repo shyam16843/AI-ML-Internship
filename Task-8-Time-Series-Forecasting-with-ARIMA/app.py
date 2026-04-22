@@ -22,7 +22,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown('<div class="main-header">📈 Apple Stock Price Forecaster</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Time Series Forecasting with ARIMA/SARIMA — BUY / HOLD Signal</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-header">Time Series Forecasting with ARIMA — BUY / HOLD Signal</div>', unsafe_allow_html=True)
 
 @st.cache_data
 def load_data():
@@ -42,21 +42,45 @@ def load_data():
 def run_forecast(_series):
     import pmdarima as pm
     series = _series
-    train_len = int(len(series) * 0.8)
-    train, test = series[:train_len], series[train_len:]
-    model = pm.auto_arima(
-        train, seasonal=False, stepwise=True,
-        error_action='ignore', suppress_warnings=True
-    )
-    forecast = model.predict(n_periods=len(test))
-    forecast = pd.Series(forecast, index=test.index)
-    return model, train, test, forecast
 
-def run_future_forecast(model, test_index, forecast_days=30):
+    # Use log transformation for better stationarity
+    log_series = np.log(series)
+
+    train_len = int(len(log_series) * 0.8)
+    train, test = log_series[:train_len], log_series[train_len:]
+
+    model = pm.auto_arima(
+        train,
+        seasonal=False,
+        stepwise=True,
+        error_action='ignore',
+        suppress_warnings=True,
+        d=1
+    )
+
+    # Forecast on log scale
+    log_forecast = model.predict(n_periods=len(test))
+
+    # Inverse transform back to price scale
+    forecast = np.exp(log_forecast)
+    actual_test = np.exp(test)
+
+    forecast = pd.Series(forecast, index=actual_test.index)
+    return model, np.exp(train), actual_test, forecast, log_series
+
+def run_future_forecast(model, last_log_value, test_index, forecast_days=30):
     from pandas.tseries.offsets import BDay
-    future_values, conf_int_array = model.predict(n_periods=forecast_days, return_conf_int=True)
-    future_values = pd.Series(future_values)
-    conf_int = pd.DataFrame(conf_int_array, columns=['lower', 'upper'])
+
+    # Predict on log scale
+    log_future, conf_int_array = model.predict(n_periods=forecast_days, return_conf_int=True)
+
+    # Inverse transform
+    future_values = pd.Series(np.exp(log_future))
+    conf_int = pd.DataFrame({
+        'lower': np.exp(conf_int_array[:, 0]),
+        'upper': np.exp(conf_int_array[:, 1])
+    })
+
     future_dates = pd.date_range(start=test_index[-1] + BDay(1), periods=forecast_days, freq='B')
     return future_dates, future_values, conf_int
 
@@ -76,7 +100,7 @@ threshold = st.sidebar.slider("BUY signal threshold (%)", 0.5, 5.0, 1.0) / 100
 show_volume = st.sidebar.checkbox("Show Volume Chart", value=True)
 st.sidebar.markdown("---")
 st.sidebar.markdown("**About**")
-st.sidebar.markdown("Uses Auto-ARIMA to forecast AAPL stock prices and generate BUY/HOLD signals.")
+st.sidebar.markdown("Uses Auto-ARIMA with log transformation to forecast AAPL stock prices and generate BUY/HOLD signals.")
 st.sidebar.markdown("---")
 st.sidebar.markdown("**Built by Ghanashyam T V**")
 st.sidebar.markdown("[GitHub](https://github.com/shyam16843) | [LinkedIn](https://linkedin.com/in/ghanashyam-tv)")
@@ -136,9 +160,14 @@ if st.button("▶️ Run Forecast", type="primary", use_container_width=True):
     with st.spinner("Training Auto-ARIMA model... this may take 1-2 minutes ⏳"):
         try:
             series = df['close'].dropna()
-            model, train, test, forecast = run_forecast(series)
+            model, train, test, forecast, log_series = run_forecast(series)
             metrics = calculate_metrics(test, forecast)
-            future_dates, future_values, conf_int = run_future_forecast(model, test.index, forecast_days)
+
+            # Get last log value for future forecast
+            last_log_value = np.log(series.iloc[-1])
+            future_dates, future_values, conf_int = run_future_forecast(
+                model, last_log_value, test.index, forecast_days
+            )
 
             # Metrics
             st.subheader("📏 Model Performance")
@@ -171,7 +200,8 @@ if st.button("▶️ Run Forecast", type="primary", use_container_width=True):
             fig, ax = plt.subplots(figsize=(14, 6))
             recent = series.tail(120)
             ax.plot(recent.index, recent, color='#2E86AB', label='Recent Price', linewidth=1.5)
-            ax.plot(future_dates, future_values.values, color='orange', label=f'{forecast_days}-Day Forecast', linewidth=2.5)
+            ax.plot(future_dates, future_values.values, color='orange',
+                    label=f'{forecast_days}-Day Forecast', linewidth=2.5)
             ax.fill_between(
                 future_dates,
                 conf_int['lower'].values,
