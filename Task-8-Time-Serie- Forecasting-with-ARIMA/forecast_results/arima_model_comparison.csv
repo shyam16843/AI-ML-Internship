@@ -1,2 +1,0 @@
-Stock,ARIMA_Order,RMSE,MAE,MAPE,R2,AIC
-AAPL,"SARIMA {'trend': 0, 'exog': 0, 'ar': 1, 'ma': 1, 'seasonal_ar': 22, 'seasonal_ma': 22, 'reduced_ar': 23, 'reduced_ma': 23, 'exog_variance': 0, 'measurement_variance': 0, 'variance': 1}",57.18766944146747,38.36749506193551,45.6722532539021,-0.5756460500863776,-14174.961931206395
