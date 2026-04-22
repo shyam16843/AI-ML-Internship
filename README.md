@@ -92,7 +92,7 @@ Each project has its own requirements. Please check individual project READMEs f
 - **LinkedIn:** [linkedin.com/in/ghanashyam-tv](https://www.linkedin.com/in/ghanashyam-tv)
 
 ------
-Here is the updated README.md segment for adding your **AI Virtual Career Counsellor** project to your existing AI-ML Internship Portfolio README, formatted consistently:
+
 
 ***
 
