@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -15,7 +16,6 @@ st.markdown("""
 <style>
     .main-header { font-size: 2.2rem; color: #2E86AB; text-align: center; margin-bottom: 0.5rem; font-weight: bold; }
     .sub-header { text-align: center; color: #6c757d; margin-bottom: 2rem; font-size: 1rem; }
-    .metric-card { background-color: #f8f9fa; padding: 1rem; border-radius: 8px; border-left: 4px solid #2E86AB; }
     .buy-signal { background-color: #d4edda; padding: 1.5rem; border-radius: 8px; border-left: 6px solid #28a745; font-size: 1.2rem; }
     .hold-signal { background-color: #fff3cd; padding: 1.5rem; border-radius: 8px; border-left: 6px solid #ffc107; font-size: 1.2rem; }
 </style>
@@ -26,7 +26,6 @@ st.markdown('<div class="sub-header">Time Series Forecasting with ARIMA/SARIMA �
 
 @st.cache_data
 def load_data():
-    import os
     base_dir = os.path.dirname(os.path.abspath(__file__))
     df = pd.read_csv(os.path.join(base_dir, "AAPL.csv"))
     df = df.rename(columns={
@@ -40,8 +39,9 @@ def load_data():
     return df
 
 @st.cache_resource
-def run_forecast(series):
+def run_forecast(_series):
     import pmdarima as pm
+    series = _series
     train_len = int(len(series) * 0.8)
     train, test = series[:train_len], series[train_len:]
     model = pm.auto_arima(
@@ -52,13 +52,12 @@ def run_forecast(series):
     forecast = pd.Series(forecast, index=test.index)
     return model, train, test, forecast
 
-@st.cache_resource
-def run_future_forecast(_model, _test_index):
+def run_future_forecast(model, test_index, forecast_days=30):
     from pandas.tseries.offsets import BDay
-    future_forecast = _model.get_forecast(steps=30)
-    future_values = future_forecast.predicted_mean
-    conf_int = future_forecast.conf_int()
-    future_dates = pd.date_range(start=_test_index[-1] + BDay(1), periods=30, freq='B')
+    future_values, conf_int_array = model.predict(n_periods=forecast_days, return_conf_int=True)
+    future_values = pd.Series(future_values)
+    conf_int = pd.DataFrame(conf_int_array, columns=['lower', 'upper'])
+    future_dates = pd.date_range(start=test_index[-1] + BDay(1), periods=forecast_days, freq='B')
     return future_dates, future_values, conf_int
 
 def calculate_metrics(actual, predicted):
@@ -139,7 +138,7 @@ if st.button("▶️ Run Forecast", type="primary", use_container_width=True):
             series = df['close'].dropna()
             model, train, test, forecast = run_forecast(series)
             metrics = calculate_metrics(test, forecast)
-            future_dates, future_values, conf_int = run_future_forecast(model, test.index)
+            future_dates, future_values, conf_int = run_future_forecast(model, test.index, forecast_days)
 
             # Metrics
             st.subheader("📏 Model Performance")
@@ -167,17 +166,16 @@ if st.button("▶️ Run Forecast", type="primary", use_container_width=True):
             st.pyplot(fig)
             plt.close()
 
-            # 30-day future forecast
+            # Future forecast chart
             st.subheader(f"📅 {forecast_days}-Day Future Forecast")
             fig, ax = plt.subplots(figsize=(14, 6))
             recent = series.tail(120)
             ax.plot(recent.index, recent, color='#2E86AB', label='Recent Price', linewidth=1.5)
-            ax.plot(future_dates[:forecast_days], future_values[:forecast_days],
-                    color='orange', label=f'{forecast_days}-Day Forecast', linewidth=2.5)
+            ax.plot(future_dates, future_values.values, color='orange', label=f'{forecast_days}-Day Forecast', linewidth=2.5)
             ax.fill_between(
-                future_dates[:forecast_days],
-                conf_int.iloc[:forecast_days, 0],
-                conf_int.iloc[:forecast_days, 1],
+                future_dates,
+                conf_int['lower'].values,
+                conf_int['upper'].values,
                 color='orange', alpha=0.2, label='95% Confidence Interval'
             )
             ax.set_title(f'AAPL — {forecast_days}-Day Price Forecast', fontsize=14, fontweight='bold')
@@ -220,10 +218,10 @@ if st.button("▶️ Run Forecast", type="primary", use_container_width=True):
 
             # Download forecast
             forecast_df = pd.DataFrame({
-                'Date': future_dates[:forecast_days],
-                'Forecasted_Price': future_values[:forecast_days].values,
-                'Lower_CI': conf_int.iloc[:forecast_days, 0].values,
-                'Upper_CI': conf_int.iloc[:forecast_days, 1].values
+                'Date': future_dates,
+                'Forecasted_Price': future_values.values,
+                'Lower_CI': conf_int['lower'].values,
+                'Upper_CI': conf_int['upper'].values
             })
             csv = forecast_df.to_csv(index=False).encode('utf-8')
             st.download_button("📥 Download Forecast CSV", csv, "aapl_forecast.csv", "text/csv")
