@@ -1,4 +1,4 @@
-# AI-ML Internship Portfolio
+# AI-ML Internship Portfolio - BroskiesHub
 
 ## Overview
 This repository contains all projects and tasks completed during my AI/ML internship.
